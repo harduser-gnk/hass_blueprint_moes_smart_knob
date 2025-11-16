@@ -241,7 +241,7 @@ action:
               #   {% if new_h > 40 %} 40 {% else %} {{ new_h }} {% endif %}
               #   {% set new_s = s %}
               #   [{{ new_h }}, {{ new_s }}]
-              kelvin: >-
+              color_temp_kelvin: >-
                 {% set xy = state_attr(light_entity,'xy_color') or [0.332,0.185] %}
                 {% set x = xy[0] %}
                 {% set y = xy[1] %}
@@ -270,7 +270,7 @@ action:
               #   {% if new_h < 180 %} 180 {% else %} {{ new_h }} {% endif %}
               #   {% set new_s = s %}
               #   [{{ new_h }}, {{ new_s }}]            
-              kelvin: >-
+              color_temp_kelvin: >-
                 {% set xy = state_attr(light_entity,'xy_color') or [0.332,0.185] %}
                 {% set x = xy[0] %}
                 {% set y = xy[1] %}
