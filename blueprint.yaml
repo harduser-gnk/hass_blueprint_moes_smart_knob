@@ -235,19 +235,26 @@ action:
             target:
               entity_id: !input light_entity
             data:
-              hs_color: >
-                {% set h, s = state_attr(light_entity,'hs_color') or [26.9, 19.2] %}
-                {% set new_h = h + 5 %}
-                {% if new_h > 40 %} 40 {% else %} {{ new_h }} {% endif %}
-                {% set new_s = s %}
-                [{{ new_h }}, {{ new_s }}]
-              # kelvin: >-
-              #   {% set current_kelvin = state_attr(light_entity, 'color_temp_kelvin') %}
-              #   {% if current_kelvin is not none %}
-              #     {{ [current_kelvin + (step_percent * step_multiplier), kelvin_max] | min }}
-              #   {% else %}
-              #     2800
-              #   {% endif %}
+              # hs_color: >
+              #   {% set h, s = state_attr(light_entity,'hs_color') or [26.9, 19.2] %}
+              #   {% set new_h = h + 5 %}
+              #   {% if new_h > 40 %} 40 {% else %} {{ new_h }} {% endif %}
+              #   {% set new_s = s %}
+              #   [{{ new_h }}, {{ new_s }}]
+              kelvin: >-
+                {% set xy = state_attr(light_entity,'xy_color') or [0.332,0.185] %}
+                {% set x = xy[0] %}
+                {% set y = xy[1] %}
+                {% set n = (x - 0.3320) / (y - 0.1858) %}
+                {% set cct = -449*n**3 + 3525*n**2 - 6823.3*n + 5520.33 %} # цветовая температура в Kelvin
+                {% set current_kelvin = cct | round(0) %} # цветовая температура в Kelvin
+                {% set max_kelvin = state_attr(light_entity,'max_color_temp_kelvin') or kelvin_max %}
+                # {% set current_kelvin = state_attr(light_entity, 'color_temp_kelvin') %}
+                {% if current_kelvin is not none %}
+                  {{ [current_kelvin + (step_percent * step_multiplier), max_kelvin] | min }}
+                {% else %}
+                  2800
+                {% endif %}
               transition: !input light_transition
       - conditions:
           - condition: template
@@ -257,19 +264,26 @@ action:
             target:
               entity_id: !input light_entity
             data:
-              hs_color: >
-                {% set h, s = state_attr('light.люстра_кухня','hs_color') or [26.9, 19.2] %}
-                {% set new_h = h - 5 %}
-                {% if new_h < 180 %} 180 {% else %} {{ new_h }} {% endif %}
-                {% set new_s = s %}
-                [{{ new_h }}, {{ new_s }}]            
-              # kelvin: >-
-              #   {% set current_kelvin = state_attr(light_entity, 'color_temp_kelvin') %}
-              #   {% if current_kelvin is not none %}
-              #     {{ [current_kelvin - (step_percent * step_multiplier), kelvin_min] | max }}
-              #   {% else %}
-              #     2800
-              #   {% endif %}
+              # hs_color: >
+              #   {% set h, s = state_attr('light.люстра_кухня','hs_color') or [26.9, 19.2] %}
+              #   {% set new_h = h - 5 %}
+              #   {% if new_h < 180 %} 180 {% else %} {{ new_h }} {% endif %}
+              #   {% set new_s = s %}
+              #   [{{ new_h }}, {{ new_s }}]            
+              kelvin: >-
+                {% set xy = state_attr(light_entity,'xy_color') or [0.332,0.185] %}
+                {% set x = xy[0] %}
+                {% set y = xy[1] %}
+                {% set n = (x - 0.3320) / (y - 0.1858) %}
+                {% set cct = -449*n**3 + 3525*n**2 - 6823.3*n + 5520.33 %} # цветовая температура в Kelvin
+                {% set current_kelvin = cct | round(0) %} # цветовая температура в Kelvin
+                {% set min_kelvin = state_attr(light_entity,'min_color_temp_kelvin') or kelvin_min %}
+                # {% set current_kelvin = state_attr(light_entity, 'color_temp_kelvin') %}
+                {% if current_kelvin is not none %}
+                  {{ [current_kelvin - (step_percent * step_multiplier), min_kelvin] | max }}
+                {% else %}
+                  2800
+                {% endif %}
               transition: !input light_transition
       - conditions:
             - condition: template
