@@ -246,10 +246,10 @@ action:
                 {% set x = xy[0] %}
                 {% set y = xy[1] %}
                 {% set n = (x - 0.3320) / (y - 0.1858) %}
-                {% set cct = -449*n**3 + 3525*n**2 - 6823.3*n + 5520.33 %} # цветовая температура в Kelvin
-                {% set current_kelvin = cct | round(0) %} # цветовая температура в Kelvin
+                {% set cct = -449*n**3 + 3525*n**2 - 6823.3*n + 5520.33 %} {# цветовая температура в Kelvin #}
+                {% set current_kelvin = cct | round(0) %} {# цветовая температура в Kelvin #}
                 {% set max_kelvin = state_attr(light_entity,'max_color_temp_kelvin') or kelvin_max %}
-                # {% set current_kelvin = state_attr(light_entity, 'color_temp_kelvin') %}
+                {# {% set current_kelvin = state_attr(light_entity, 'color_temp_kelvin') %} #}
                 {% if current_kelvin is not none %}
                   {{ [current_kelvin + (step_percent * step_multiplier), max_kelvin] | min }}
                 {% else %}
@@ -275,10 +275,10 @@ action:
                 {% set x = xy[0] %}
                 {% set y = xy[1] %}
                 {% set n = (x - 0.3320) / (y - 0.1858) %}
-                {% set cct = -449*n**3 + 3525*n**2 - 6823.3*n + 5520.33 %} # цветовая температура в Kelvin
-                {% set current_kelvin = cct | round(0) %} # цветовая температура в Kelvin
+                {% set cct = -449*n**3 + 3525*n**2 - 6823.3*n + 5520.33 %} {# цветовая температура в Kelvin #}
+                {% set current_kelvin = cct | round(0) %} {# цветовая температура в Kelvin #}
                 {% set min_kelvin = state_attr(light_entity,'min_color_temp_kelvin') or kelvin_min %}
-                # {% set current_kelvin = state_attr(light_entity, 'color_temp_kelvin') %}
+                {# {% set current_kelvin = state_attr(light_entity, 'color_temp_kelvin') %} #}
                 {% if current_kelvin is not none %}
                   {{ [current_kelvin - (step_percent * step_multiplier), min_kelvin] | max }}
                 {% else %}
