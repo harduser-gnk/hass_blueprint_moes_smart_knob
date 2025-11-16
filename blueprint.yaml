@@ -1,13 +1,13 @@
 blueprint:
-  name: "Control light entity with Tuya ERS-10TZBVK-AA Smart Knob (command mode) - v 1.1"
+  name: "Control light entity with Moes ZG-101ZD button Smart Knob (command mode) - v 1.1.1"
   description: >
-    Blueprint to easily configure the **Tuya ERS-10TZBVK-AA Smart Knob** to control a light entity when integrated into Home Assistant using **Zigbee2MQTT**.
+    Blueprint to easily configure the **Moes ZG-101ZD button Smart Knob** to control a light entity when integrated into Home Assistant using **Zigbee2MQTT**.
 
     
     It is based directly on the MQTT-Topic as this turned out to be the most responsive way to automate this dimmer device.
 
     
-    Also see [the device page](https://www.zigbee2mqtt.io/devices/ERS-10TZBVK-AA.html) on the Z2M homepage for more information.
+    Also see [the device page](https://www.zigbee2mqtt.io/devices/ZG-101ZD.html) on the Z2M homepage for more information.
 
     
     **Important Note:** The device needs to be in **COMMAND mode** – the other one being EVENT mode – for the automation to work. However the blueprint will automatically check for the correct mode and should keep the device in COMMAND.
@@ -40,12 +40,12 @@ blueprint:
      - Fine-tune the resolution of the color temperature adjustments through step multiplier (1-10).
     </details>
     
-  source_url: https://raw.githubusercontent.com/TriggrHappy/blueprint_tuya_smart_knob/refs/heads/main/blueprint.yaml
+  source_url: https://raw.githubusercontent.com/harduser-gnk/hass_blueprint_moes_smart_knob/refs/heads/main/blueprint.yaml
   domain: automation
   input:
     mqtt_topic:
       name: MQTT Topic
-      description: "The parent MQTT topic of the smart knob (e.g. 'zigbee2mqtt/Tuya Smart Knob)'. Typically the last part will be the given name of your device."
+      description: "The parent MQTT topic of the smart knob (e.g. 'zigbee2mqtt/Moes Smart Knob)'. Typically the last part will be the given name of your device."
       selector:
         text:
     light_entity:
@@ -55,9 +55,15 @@ blueprint:
         entity:
           filter:
             - domain: light
+    double_press_action:
+      name: Double Press Action
+      description: "Choose an action for button double press. Leave blank if you do not want to use it."
+      default: []
+      selector:
+        action: {}
     long_press_action:
       name: Long Press Action
-      description: "Choose an action for button long press (>3 seconds). Leave blank if you do not want to use it."
+      description: "Choose an action for button long press (> 3 seconds). Leave blank if you do not want to use it."
       default: []
       selector:
         action: {}
@@ -124,7 +130,7 @@ blueprint:
     automation_mode:
       name: Automation Mode
       description: "Experiment with the different modes if your experience does not feel smooth enough. Normally single should work alright. (Also see https://www.home-assistant.io/docs/automation/modes/ )"
-      default: single
+      default: queued
       selector:
         select:
           mode: dropdown
@@ -138,8 +144,16 @@ trigger:
   - platform: mqtt
     topic: !input mqtt_topic
 
-condition: []
-
+conditions:
+  - condition: template
+    value_template: |
+      {% set allowed = [
+          'toggle', 'brightness_step_up', 'brightness_step_down',
+          'color_temperature_step_up', 'color_temperature_step_down',
+          'saturation_move', 'hue_move', 'hue_stop',
+          'double'
+      ] %} {{ trigger.payload_json.action in allowed }}
+      
 action:
   - variables:
       command: "{{ trigger.payload_json.action }}"
@@ -164,14 +178,14 @@ action:
       light_entity: !input light_entity
 
   - choose:
-      - conditions:
-          - condition: template
-            value_template: "{{ command == 'single' or command == 'double' or command == 'rotate_left' or command == 'rotate_right' or command == 'hold' }}"
-        sequence:
-          - service: mqtt.publish
-            data:
-              topic: "{{ mqtt_topic }}/set"
-              payload: '{"operation_mode": "command"}'
+      # - conditions:
+      #     - condition: template
+      #       value_template: "{{ command == 'single' or command == 'double' or command == 'rotate_left' or command == 'rotate_right' or command == 'hold' }}"
+      #   sequence:
+      #     - service: mqtt.publish
+      #       data:
+      #         topic: "{{ mqtt_topic }}/set"
+      #         payload: '{"operation_mode": "command"}'
   
       - conditions:
           - condition: template
@@ -244,6 +258,10 @@ action:
                   2800
                 {% endif %}
               transition: !input light_transition
+      - conditions:
+            - condition: template
+              value_template: "{{ command == 'double' }}"
+        sequence: !input double_press_action        
       - conditions:
             - condition: template
               value_template: "{{ command == 'hue_move' }}"
