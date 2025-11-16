@@ -1,8 +1,10 @@
 blueprint:
   name: "Control light entity with Moes ZG-101ZD button Smart Knob (command mode) - v 1.1.1"
   description: >
+    This blueprint project for Home Assistant using **Zigbee2MQTT** is an adaptation of the original  
+    [@TriggrHappy/hass_blueprint_tuya_smart_knob](https://github.com/TriggrHappy/hass_blueprint_tuya_smart_knob)  
+    to ensure correct operation with the [**Moes ZG-101ZD** button](https://www.zigbee2mqtt.io/devices/ZG-101ZD.html).
     Blueprint to easily configure the **Moes ZG-101ZD button Smart Knob** to control a light entity when integrated into Home Assistant using **Zigbee2MQTT**.
-
     
     It is based directly on the MQTT-Topic as this turned out to be the most responsive way to automate this dimmer device.
 
